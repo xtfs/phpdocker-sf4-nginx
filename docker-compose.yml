@@ -1,0 +1,39 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    redis:
+      image: redis:alpine
+      container_name: carry-redis
+
+    postgres:
+      image: postgres:11.1-alpine
+      container_name: carry-postgres
+      working_dir: /application
+      volumes:
+        - .:/application
+      environment:
+        - POSTGRES_USER=evencode
+        - POSTGRES_PASSWORD=123
+        - POSTGRES_DB=even_carry
+
+    webserver:
+      image: nginx:alpine
+      container_name: carry-webserver
+      working_dir: /application
+      volumes:
+          - .:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+       - "8080:80"
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: carry-php-fpm
+      working_dir: /application
+      volumes:
+        - .:/application
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+
